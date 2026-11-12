@@ -10,7 +10,7 @@ Serve this folder from a local web server (ES modules and Firebase imports do no
 
 1. Create a Firebase project and register a Web app.
 2. Enable **Authentication → Email/Password** and **Cloud Firestore**.
-3. Put the web app configuration in `firebase-config.js`.
+3. Replace the placeholders in `firebase-config.js` with the Web app values. Keep the format `export const firebaseConfig = { ... };`. This static app loads Firebase from browser modules, so do not paste `import` statements, `initializeApp()`, or `getFirestore()` into this file.
 4. Publish the rules in `firestore.rules`.
 
 Create accounts from Aerotwin's sign-in page. Usernames map to Firebase Auth email addresses as `<username>@aerotwin.app`. Add `localhost` and your deployed domain in Firebase Authentication's **Settings → Authorized domains**. Authenticated fleet data lives at `users/{uid}/data/fleet`; Firestore rules scope reads and writes to the signed-in UID. Create virtual UAVs in the simulator; it assigns each a passkey. On the dashboard, choose **Add aircraft → connect** to enter that UAV ID and passkey and open its twin. Demo fleet access is disabled; a new account starts empty, and a manually registered aircraft shows unavailable health values until telemetry is recorded.

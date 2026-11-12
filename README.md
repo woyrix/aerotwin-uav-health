@@ -13,7 +13,7 @@ Serve this folder from a local web server (ES modules and Firebase imports do no
 3. Put the web app configuration in `firebase-config.js`.
 4. Publish the rules in `firestore.rules`.
 
-Create accounts from Aerotwin's sign-in page. Usernames map to Firebase Auth email addresses as `<username>@aerotwin.app`. Authenticated fleet data lives at `users/{uid}/data/fleet`; Firestore rules scope reads and writes to the signed-in UID. Create virtual UAVs in the simulator; it assigns each a passkey. On the dashboard, choose **Add aircraft → connect** to enter that UAV ID and passkey and open its twin. Demo fleet access is disabled; a new account starts empty, and a manually registered aircraft shows unavailable health values until telemetry is recorded.
+Create accounts from Aerotwin's sign-in page. Usernames map to Firebase Auth email addresses as `<username>@aerotwin.app`. Add `localhost` and your deployed domain in Firebase Authentication's **Settings → Authorized domains**. Authenticated fleet data lives at `users/{uid}/data/fleet`; Firestore rules scope reads and writes to the signed-in UID. Create virtual UAVs in the simulator; it assigns each a passkey. On the dashboard, choose **Add aircraft → connect** to enter that UAV ID and passkey and open its twin. Demo fleet access is disabled; a new account starts empty, and a manually registered aircraft shows unavailable health values until telemetry is recorded.
 
 ## Prototype scope
 

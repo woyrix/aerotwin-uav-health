@@ -1,6 +1,6 @@
 import { firebaseConfig } from './firebase-config.js';
 
-let auth=null, authFns=null, dbFns=null, appInstance=null, currentUser=null, signedIn=false;
+let auth=null, authFns=null, dbFns=null, appInstance=null, currentUser=null, signedIn=false, firebaseReady=null, firebaseInitMessage='';
 let fleet=[], selected=0, simulationRunning=true, faultActive=false, simulatorUpdate=null, fleetUnsubscribe=null;
 let fleetSaveTimer=null, chatHistory=[], chatTurns=[], geminiApiKey='', sendingChat=false, buzzerTimer=null, dashboardFilter='all';
 const $=id=>document.getElementById(id);
@@ -16,7 +16,8 @@ function initials(name=''){return name.split(/[\s._-]+/).filter(Boolean).slice(0
 function localFleetKey(){return currentUser?`aerotwin:fleet:${currentUser.uid}`:null}
 
 async function configureFirebase(){
-  if(!firebaseConfig.apiKey||firebaseConfig.apiKey.startsWith('YOUR_')){showMessage('Firebase is not connected yet. Follow the setup guide below.');return}
+  const required=['apiKey','authDomain','projectId','appId'];
+  if(required.some(key=>!firebaseConfig[key]||String(firebaseConfig[key]).startsWith('YOUR_'))){firebaseInitMessage='Firebase is not connected yet. Add your web app config, then follow the setup guide below.';showMessage(firebaseInitMessage);return}
   try{
     const [appMod,authMod,firestore]=await Promise.all([
       import('https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js'),
@@ -28,7 +29,19 @@ async function configureFirebase(){
       if(user){currentUser=user;signedIn=true;await loadFleet();updateIdentity();if($('login'))enterApp();else{renderUavList();renderSelectedUav()}watchCloudFleet()}
       else{fleetUnsubscribe?.();fleetUnsubscribe=null;if(signedIn){currentUser=null;signedIn=false;fleet=[];if($('app')){$('app').classList.add('hidden');$('login').classList.remove('hidden')}else{renderUavList();renderSelectedUav()}}}
     });
-  }catch(e){console.warn('Firebase initialization failed',e);showMessage('Firebase could not start. Check firebase-config.js and enabled services.')}
+  }catch(e){console.warn('Firebase initialization failed',e);firebaseInitMessage=`Firebase could not start (${e.code||'SDK load error'}). Check firebase-config.js, network access, and enabled services.`;showMessage(firebaseInitMessage)}
+}
+function friendlyAuthError(err,action){
+  const code=err?.code||'';
+  if(code==='auth/unauthorized-domain')return `This site (${location.hostname}) is not authorized in Firebase. Add it under Authentication → Settings → Authorized domains.`;
+  if(code==='auth/operation-not-allowed'||code==='auth/admin-restricted-operation')return 'Email/Password sign-in is disabled. Enable it in Firebase Authentication → Sign-in method.';
+  if(code==='auth/email-already-in-use')return 'That username is already registered. Sign in instead, or choose another username.';
+  if(code==='auth/weak-password')return 'Firebase requires a password with at least 6 characters.';
+  if(code==='auth/invalid-api-key'||code==='auth/configuration-not-found')return 'Firebase configuration is invalid or Authentication is not set up. Check firebase-config.js and the Firebase console.';
+  if(code==='auth/invalid-credential'||code==='auth/user-not-found'||code==='auth/wrong-password')return 'Incorrect username or password.';
+  if(code==='auth/network-request-failed')return 'Firebase could not be reached. Check your internet connection, browser extensions, and Firebase status.';
+  if(code==='auth/invalid-email')return 'That username could not be mapped to a valid Firebase account. Use letters, numbers, dots, underscores, or hyphens.';
+  return `${action} failed${code?` (${code})`:''}: ${err?.message||'Check Firebase setup.'}`;
 }
 
 async function loadFleet(){
@@ -96,11 +109,11 @@ function playBuzzer(){try{const C=window.AudioContext||window.webkitAudioContext
 function setAudibleAlerts(on){$('buzzerToggle')?.classList.toggle('on',on);if($('buzzerState'))$('buzzerState').textContent=on?'On':'Off';clearInterval(buzzerTimer);if(on){playBuzzer();buzzerTimer=setInterval(()=>{if(fleet.some(a=>hasFault(a)))playBuzzer()},9000)}}
 
 document.addEventListener('DOMContentLoaded',()=>{
-  configureFirebase();
+  firebaseReady=configureFirebase();
   window.addEventListener('storage',e=>{if(currentUser&&e.key===localFleetKey()){try{fleet=JSON.parse(e.newValue||'[]')}catch{fleet=[]}renderDashboard()}});
   if($('loginForm')){
-    $('loginForm').onsubmit=async e=>{e.preventDefault();const username=safeUsername($('username').value),password=$('password').value;if(!username){showMessage('Enter a valid username.');return}if(!auth||!authFns){showMessage('Firebase is not configured. Follow the setup guide first.');return}try{await authFns.signInWithEmailAndPassword(auth,userEmail(username),password)}catch(err){showMessage(err.code==='auth/invalid-credential'?'Incorrect username or password.':err.message)}};
-    $('createAccount').onclick=async()=>{const username=safeUsername($('username').value),password=$('password').value;if(!auth||!authFns){showMessage('Firebase is not configured. Follow the setup guide first.');return}if(!username||password.length<6){showMessage('Enter a username and a password with at least 6 characters.');return}try{const cred=await authFns.createUserWithEmailAndPassword(auth,userEmail(username),password);await authFns.updateProfile(cred.user,{displayName:username});showMessage('Account created. Your fleet is private to this account.',false)}catch(err){showMessage(err.code==='auth/email-already-in-use'?'That username is already registered.':err.message)}};
+    $('loginForm').onsubmit=async e=>{e.preventDefault();const username=safeUsername($('username').value),password=$('password').value;if(!username){showMessage('Enter a valid username.');return}showMessage('Connecting to Firebase…',false);await firebaseReady;if(!auth||!authFns){showMessage(firebaseInitMessage||'Firebase is not ready. Follow the setup guide below.');return}try{await authFns.signInWithEmailAndPassword(auth,userEmail(username),password)}catch(err){showMessage(friendlyAuthError(err,'Sign-in'))}};
+    $('createAccount').onclick=async()=>{const username=safeUsername($('username').value),password=$('password').value;if(!username||password.length<6){showMessage('Enter a username and a password with at least 6 characters.');return}showMessage('Connecting to Firebase…',false);await firebaseReady;if(!auth||!authFns){showMessage(firebaseInitMessage||'Firebase is not ready. Follow the setup guide below.');return}try{const cred=await authFns.createUserWithEmailAndPassword(auth,userEmail(username),password);await authFns.updateProfile(cred.user,{displayName:username});showMessage('Account created. Your fleet is private to this account.',false)}catch(err){showMessage(friendlyAuthError(err,'Account creation'))}};
     $('signout').onclick=async()=>{if(auth&&authFns)await authFns.signOut(auth);fleetUnsubscribe?.();currentUser=null;signedIn=false;fleet=[];$('app').classList.add('hidden');$('login').classList.remove('hidden')};
     $('addAircraft').onclick=addAircraft;$('buzzerToggle').onclick=()=>setAudibleAlerts(!$('buzzerToggle').classList.contains('on'));
     $('allAircraftFilter').onclick=()=>{dashboardFilter='all';renderDashboard()};$('attentionFilter').onclick=()=>{dashboardFilter='attention';renderDashboard()};

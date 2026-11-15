@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Aerotwin — Firebase setup</title>
+  <title>Aerotwin — setup</title>
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="aerotwin-overrides.css">
 </head>
@@ -11,16 +11,14 @@
   <main class="setup-page">
     <a href="index.html" class="brand"><span class="brand-mark">A</span><span>AEROTWIN</span></a>
     <span class="eyebrow">FIRST-RUN GUIDE</span>
-    <h1>Connect Aerotwin services</h1>
-    <p class="setup-lead">Firebase provides account sign-in and private fleet storage. Woyrix uses a Firebase-hosted function so the Gemini key stays on the server.</p>
+    <h1>Connect Aerotwin</h1>
+    <p class="setup-lead">Firebase handles account sign-in and private fleet storage. Woyrix uses the demo Gemini key configured in the app.</p>
     <ol class="setup-steps">
-      <li><h2>Configure Firebase</h2><p>Create a Firebase project and Web app. Enable <b>Authentication → Email/Password</b>, create Cloud Firestore, and publish <code>firestore.rules</code>. Add <code>localhost</code> and your Vercel domain under <b>Authentication → Settings → Authorized domains</b>.</p></li>
-      <li><h2>Install and select the Firebase CLI project</h2><p>Install Node.js 22 and Firebase CLI. In the Aerotwin folder run <code>firebase login</code>, then <code>firebase use --add</code> and select the same project as <code>firebase-config.js</code>.</p></li>
-      <li><h2>Set your private Gemini key once</h2><p>Revoke any Gemini key that was shared in a chat, screenshot, source file, or public repository. Create a replacement in Google AI Studio, then run <code>firebase functions:secrets:set GEMINI_API_KEY</code>. Paste the replacement only into the CLI's hidden prompt; it is stored in Google Secret Manager and is not added to app files or GitHub.</p></li>
-      <li><h2>Deploy Woyrix's backend</h2><p>From this folder run <code>firebase deploy --only functions</code>. The callable function requires Firebase sign-in, reads only that account's fleet, limits request rate, and sends prompts to Gemini. Cloud Functions deployment requires the Firebase project to use the Blaze plan; Google may charge for function and model usage.</p></li>
-      <li><h2>Deploy the website to Vercel</h2><p>Import the GitHub repository in Vercel. Use the repository root as the project root, with no build command and <code>.</code> as the output directory. Deploy the function separately with Firebase CLI as above. Once both are deployed, Vercel serves the website and Firebase runs Woyrix; your PC can be off.</p></li>
+      <li><h2>Configure Firebase</h2><p>Enable <b>Authentication → Email/Password</b> and create Cloud Firestore. Publish the rules in <code>firestore.rules</code>. Add <code>localhost</code> and your Vercel domain under <b>Authentication → Settings → Authorized domains</b>.</p></li>
+      <li><h2>Configure Gemini for the demo</h2><p>For local use, put your demo key in the ignored <code>gemini-config.js</code> file. For Vercel, set <code>GEMINI_API_KEY</code> under Project Settings → Environment Variables and use <code>npm run build</code>. The generated browser config is visible to website users. Use a restricted key with a low quota, then revoke it after the hackathon.</p></li>
+      <li><h2>Deploy to Vercel</h2><p>Import the GitHub repository. Choose the repository root, Framework Preset <b>Other</b>, build command <code>npm run build</code>, and output directory <code>.</code>. Vercel builds and serves the static site, so your PC does not need to stay on after deployment.</p></li>
     </ol>
-    <div class="setup-note"><b>Keep the key private:</b> Never paste the Gemini key into <code>app.js</code>, <code>firebase-config.js</code>, Vercel client-side variables, a browser form, or GitHub. The Firebase Web app configuration is public client configuration; the Gemini key belongs only in Firebase Secret Manager.</div>
+    <div class="setup-note"><b>Firebase web config:</b> Keep the Web app settings in the format <code>export const firebaseConfig = { … }</code>. These are client settings; never paste Gemini keys into <code>firebase-config.js</code>.</div>
     <p class="setup-safety">This prototype uses estimated/simulated data and is not an aircraft maintenance or flight-safety authority.</p>
     <a class="button button-primary setup-back" href="index.html">Back to sign in</a>
   </main>

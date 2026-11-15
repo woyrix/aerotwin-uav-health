@@ -1,0 +1,7 @@
+{
+  "name": "aerotwin-static-demo",
+  "private": true,
+  "scripts": {
+    "build": "node scripts/write-gemini-config.cjs"
+  }
+}

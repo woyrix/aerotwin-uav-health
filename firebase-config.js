@@ -1,11 +1,10 @@
-// Create a Firebase web app and paste its config here. Enable Email/Password
-// Authentication and Cloud Firestore. Username sign-in uses
-// <username>@aerotwin.app as the Firebase email address.
-export const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyDHjW66Ldwh9CESzmXjHw8Qf5u-lNiV5Xg",
+  authDomain: "aerotwin-19be4.firebaseapp.com",
+  projectId: "aerotwin-19be4",
+  storageBucket: "aerotwin-19be4.firebasestorage.app",
+  messagingSenderId: "21372307018",
+  appId: "1:21372307018:web:41f27eeb8258063b54c8b3",
+  measurementId: "G-GBZ4VMR0S2"
 };

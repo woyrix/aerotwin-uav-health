@@ -91,12 +91,12 @@ function startTwin(T, host) {
   }
   function addSensor(id, label, position, size = 0.115) {
     const holder = new T.Group(); holder.name = `${label} sensor`; holder.position.set(...position); airframe.add(holder);
-    const base = addMesh(new T.CylinderGeometry(size * 0.56, size * 0.68, size * 0.45, 16), darkMat, holder, `${label} sensor housing`);
+    const base = addMesh(new T.CylinderGeometry(size * 0.56, size * 0.68, size * 0.45, 16), darkMat.clone(), holder, `${label} sensor housing`);
     base.rotation.x = Math.PI / 2;
     const ledMat = new T.MeshStandardMaterial({ color: normalSensor, roughness: 0.26, metalness: 0.24, emissive: normalSensor, emissiveIntensity: 0.14 });
     const cap = addMesh(new T.SphereGeometry(size * 0.43, 18, 12), ledMat, holder, `${label} sensor marker`); cap.position.y = size * 0.55;
-    const collar = addMesh(new T.TorusGeometry(size * 0.51, size * 0.07, 8, 20), metalMat, holder); collar.position.y = size * 0.52; collar.rotation.x = Math.PI / 2;
-    holder.userData = { id, label, material: ledMat, cap, holder };
+    const collar = addMesh(new T.TorusGeometry(size * 0.51, size * 0.07, 8, 20), metalMat.clone(), holder); collar.position.y = size * 0.52; collar.rotation.x = Math.PI / 2;
+    holder.userData = { id, label, material: ledMat, cap, housing:base.material, collar:collar.material, holder };
     sensors[id] = holder;
     return holder;
   }
@@ -157,6 +157,7 @@ function startTwin(T, host) {
   addBox(airframe,'Fuel flow module',[.24,.11,.28],[-.33,-.06,-1.05],moduleMat);
   addBox(airframe,'Fuel pressure module',[.2,.1,.22],[.36,-.07,-.92],moduleMat);
   addSensor('cht','Cylinder head temp',[.41,.27,-1.36],.14);
+  addSensor('rpm','Engine RPM',[0,.47,-1.55],.13);
   addSensor('vibration','Vibration',[-.42,.23,-.56],.12);
   addSensor('oil','Oil pressure',[.36,.12,-1.82],.12);
   addSensor('fuelFlow','Fuel flow',[-.33,.13,-1.05],.12);
@@ -197,10 +198,22 @@ function startTwin(T, host) {
   function setFault(detail={}) {
     const severity=Number(detail.severity||0), issue=String(detail.issue||'').toLowerCase(); activeFault=severity>0;
     for(const [id,group] of Object.entries(sensors)){
-      const m=group.userData.material; const affected=activeFault && ((id==='cht'||id==='exhaust')&&(/temperature|overheat/.test(issue))||id==='oil'&&issue.includes('oil')||id==='vibration'&&issue.includes('vibration')||(id==='fuelFlow'||id==='fuelPressure')&&issue.includes('fuel'));
-      m.color.set(affected?faultSensor:normalSensor);m.emissive.set(affected?faultSensor:normalSensor);m.emissiveIntensity=affected ? 0.95 : 0.14;
+      const affected=activeFault&&(
+        id==='cht'&&(/cylinder temperature|overheat/.test(issue))||
+        id==='exhaust'&&(/exhaust temperature|overheat/.test(issue))||
+        id==='oil'&&issue.includes('oil')||
+        id==='vibration'&&issue.includes('vibration')||
+        (id==='fuelFlow'||id==='fuelPressure')&&issue.includes('fuel')||
+        id==='rpm'&&(/overspeed|maximum load/.test(issue))
+      );
+      const {material:m,housing,collar}=group.userData;
+      m.color.set(affected?faultSensor:normalSensor);m.emissive.set(affected?faultSensor:normalSensor);m.emissiveIntensity=affected?2.2:.14;
+      group.userData.cap.scale.setScalar(affected?1.8:1);
+      housing.color.set(affected?faultSensor:0x263740);housing.emissive.set(affected?faultSensor:0x000000);housing.emissiveIntensity=affected?.8:0;
+      collar.color.set(affected?faultSensor:0xa2b1b6);collar.emissive.set(affected?faultSensor:0x000000);collar.emissiveIntensity=affected?1.2:0;
     }
-    engineParts.forEach(part=>{part.material.color.set(activeFault?faultSensor:0x263740);if(part.material.emissive)part.material.emissive.set(activeFault?0x631c19:0x000000);});
+    const engineFault=activeFault&&(/temperature|oil|overspeed|maximum load/.test(issue));
+    engineParts.forEach(part=>{part.material.color.set(engineFault?faultSensor:0x263740);if(part.material.emissive)part.material.emissive.set(engineFault?0x631c19:0x000000);});
   }
   window.aerotwinTwin={
     rotateBy(axis,amount){twin.rotation[axis]+=amount;},

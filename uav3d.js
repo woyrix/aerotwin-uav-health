@@ -15,8 +15,8 @@ function startTwin(T, host) {
   const stage = document.getElementById('modelStage');
   const scene = new T.Scene();
   scene.background = new T.Color('#090909');
-  const camera = new T.PerspectiveCamera(36, 1, 0.1, 100);
-  const baseCamera = new T.Vector3(9, 7.2, 14.5);
+  const camera = new T.PerspectiveCamera(30, 1, 0.1, 100);
+  const baseCamera = new T.Vector3(12, 9, 18);
   const renderer = new T.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   renderer.outputColorSpace = T.SRGBColorSpace;
@@ -45,8 +45,8 @@ function startTwin(T, host) {
   const faultSensor = new T.Color('#df574d');
 
   const mat = (color, roughness = 0.46, metalness = 0.12, extra = {}) => new T.MeshStandardMaterial({ color, roughness, metalness, ...extra });
-  const shellMat = new T.MeshPhysicalMaterial({ color: 0xb9c7ce, roughness: 0.38, metalness: 0.12, transparent: true, opacity: 0.3, side: T.DoubleSide, depthWrite: false, clearcoat: 0.25, clearcoatRoughness: 0.3 });
-  const wingMat = new T.MeshPhysicalMaterial({ color: 0xd1d8dc, roughness: 0.42, metalness: 0.1, transparent: true, opacity: 0.4, side: T.DoubleSide, depthWrite: false, clearcoat: 0.22 });
+  const shellMat = new T.MeshPhysicalMaterial({ color: 0xb9c0c4, roughness: 0.42, metalness: 0.08, transparent: true, opacity: 0.48, side: T.DoubleSide, depthWrite: false, clearcoat: 0.28, clearcoatRoughness: 0.3 });
+  const wingMat = new T.MeshPhysicalMaterial({ color: 0xc4cacf, roughness: 0.46, metalness: 0.06, transparent: true, opacity: 0.68, side: T.DoubleSide, depthWrite: false, clearcoat: 0.24 });
   const innerMat = mat('#8299a3', 0.48, 0.18);
   const darkMat = mat('#263740', 0.43, 0.42);
   const metalMat = mat('#a2b1b6', 0.26, 0.76);
@@ -102,12 +102,13 @@ function startTwin(T, host) {
   }
 
   // Long-endurance MALE airframe: high aspect-ratio wing, twin tail booms and rear pusher.
-  loftFuselage([[ -2.55,.055,.06],[-2.25,.14,.14],[-1.72,.21,.2],[-.85,.29,.26],[0,.32,.29],[.72,.28,.26],[1.42,.2,.19],[1.9,.12,.12],[2.23,.035,.04]], shellMat);
+  loftFuselage([[-2.58,.07,.075],[-2.32,.17,.16],[-1.9,.27,.22],[-1.2,.36,.29],[-.35,.4,.32],[.62,.38,.31],[1.42,.33,.28],[2.02,.25,.22],[2.36,.14,.15],[2.46,.045,.07]], shellMat);
+  const noseCap=addMesh(new T.SphereGeometry(1,24,16),shellMat,airframe,'Rounded nose shell');noseCap.scale.set(.12,.12,.22);noseCap.position.z=2.4;
   planform([[-5.15,-.22],[-4.55,.34],[4.55,.34],[5.15,-.22],[4.85,-.53],[-4.85,-.53]], wingMat, -0.015, .095, 'High aspect-ratio main wing');
-  planform([[-1.18,-3.62],[1.18,-3.62],[1.08,-3.9],[-1.08,-3.9]], wingMat, 0.015, .075, 'Straight tailplane');
+  planform([[-1.62,-3.62],[1.62,-3.62],[1.5,-3.9],[-1.5,-3.9]], wingMat, 0.015, .075, 'Straight tailplane');
   // Twin tail booms lead from the main wing to separate vertical stabilizers.
-  [-.68,.68].forEach(x=>{
-    tube(airframe,[[x,.035,-.28],[x*1.04,.045,-1.45],[x*1.12,.065,-3.72]],.052,innerMat,'Twin tail boom');
+  [-1.4,1.4].forEach(x=>{
+    tube(airframe,[[x,.035,-.28],[x*1.02,.045,-1.45],[x*1.02,.065,-3.72]],.052,innerMat,'Twin tail boom');
     const finShape=new T.Shape();finShape.moveTo(3.52,.06);finShape.lineTo(3.72,.66);finShape.lineTo(3.98,.66);finShape.lineTo(4.12,.06);finShape.closePath();
     const finGeo=new T.ExtrudeGeometry(finShape,{depth:.075,bevelEnabled:true,bevelSegments:2,bevelSize:.02,bevelThickness:.02});finGeo.rotateY(Math.PI/2);
     const fin=addMesh(finGeo,wingMat,airframe,'Twin-boom vertical stabilizer');fin.position.x=x-.0375;
@@ -115,7 +116,7 @@ function startTwin(T, host) {
   // Spars, ribs and control surfaces give the airframe depth and construction detail.
   [-3.65,-2.75,-1.8,-.9,0,.9,1.8,2.75,3.65].forEach(x => tube(airframe, [[x,-.005,-.42],[x*.82,-.005,-.02],[x*.32,-.005,.32]], .012, innerMat, 'Wing rib'));
   tube(airframe, [[-4.4,-.04,-.32],[0,-.04,-.49],[4.4,-.04,-.32]], .026, darkMat, 'Main wing spar');
-  tube(airframe, [[-1.12,.02,-3.76],[0,.02,-3.76],[1.12,.02,-3.76]], .025, darkMat, 'Tail spar');
+  tube(airframe, [[-1.42,.02,-3.76],[0,.02,-3.76],[1.42,.02,-3.76]], .025, darkMat, 'Tail spar');
   // No pilot canopy: the nose carries an optical payload turret typical of an unmanned aircraft.
   const turret=addMesh(new T.SphereGeometry(.24,24,16),new T.MeshPhysicalMaterial({color:0x718893,roughness:.2,metalness:.42,clearcoat:.7}),airframe,'EO/IR sensor turret');turret.scale.set(1,.72,1);turret.position.set(0,-.24,1.55);
   addMesh(new T.SphereGeometry(.11,18,12),mat('#283c45',.16,.28,{emissive:'#17313a',emissiveIntensity:.18}),airframe,'Optical sensor lens').scale.set(.8,.8,.45);
@@ -131,10 +132,14 @@ function startTwin(T, host) {
   for (let z=-.35;z<.18;z+=.095) { const finRing=addMesh(new T.TorusGeometry(.29,.025,8,28), metalMat.clone(), engine, 'Cooling fin'); finRing.position.z=z; engineParts.push(finRing); }
   const head = addMesh(new T.BoxGeometry(.41,.37,.34), mat('#667a82',.42,.45), engine, 'Cylinder head'); head.position.set(0,.24,.02); engineParts.push(head);
   addMesh(new T.SphereGeometry(.09,14,10), metalMat, engine, 'Spark plug').position.set(0,.45,.02);
-  addCylinder(engine, 'Propeller shaft', .07,.07,.43,[0,0,-.58],metalMat,[Math.PI/2,0,0],16);
-  const prop = new T.Group(); prop.position.set(0,0,-.82); engine.add(prop);
+  addCylinder(engine, 'Propeller shaft', .07,.07,.56,[0,0,-.84],metalMat,[Math.PI/2,0,0],16);
+  const prop = new T.Group(); prop.position.set(0,0,-1.12); engine.add(prop);
   addCylinder(prop,'Propeller hub',.12,.1,.15,[0,0,0],metalMat,[Math.PI/2,0,0],18);
-  for (let i=0;i<2;i++) { const blade=addMesh(new T.BoxGeometry(.12,1.3,.055),mat('#283b45',.3,.5),prop,'Pusher propeller blade');blade.position.y=.73;blade.rotation.z=i*Math.PI; }
+  for(let i=0;i<3;i++){
+    const bladeShape=new T.Shape();bladeShape.moveTo(-.045,.08);bladeShape.lineTo(-.105,.34);bladeShape.lineTo(-.085,.78);bladeShape.lineTo(-.025,1.23);bladeShape.lineTo(.045,1.2);bladeShape.lineTo(.11,.62);bladeShape.lineTo(.07,.2);bladeShape.closePath();
+    const bladeGeo=new T.ExtrudeGeometry(bladeShape,{depth:.045,bevelEnabled:true,bevelSegments:2,bevelSize:.012,bevelThickness:.01});
+    const blade=addMesh(bladeGeo,mat('#606a6f',.38,.28),prop,'Three-blade pusher propeller');blade.rotation.z=i*Math.PI*2/3;
+  }
 
   // Clear inspection cutaway reveals the controller, power regulation and data wiring.
   const avionics = new T.Group(); avionics.position.set(0,-.08,-.12); airframe.add(avionics);
@@ -188,7 +193,7 @@ function startTwin(T, host) {
   const stopDrag = e => { dragging=false; if(!moved){const rect=renderer.domElement.getBoundingClientRect();pointer.x=((e.clientX-rect.left)/rect.width)*2-1;pointer.y=-((e.clientY-rect.top)/rect.height)*2+1;raycaster.setFromCamera(pointer,camera);const hit=raycaster.intersectObjects(pickable,false)[0];if(hit){const info=hit.object.parent.userData;window.dispatchEvent(new CustomEvent('aerotwin:sensor-selected',{detail:{id:info.id,label:info.label}}));}} };
   renderer.domElement.addEventListener('pointerup',stopDrag); renderer.domElement.addEventListener('pointercancel',()=>dragging=false);
   renderer.domElement.addEventListener('wheel', e => {e.preventDefault();setZoom(zoom+(e.deltaY<0?.07:-.07));},{passive:false});
-  function setZoom(value){zoom=Math.min(1.35,Math.max(.7,value));updateCamera();window.dispatchEvent(new CustomEvent('aerotwin:zoom',{detail:{zoom}}));}
+  function setZoom(value){zoom=Math.min(1.75,Math.max(.7,value));updateCamera();window.dispatchEvent(new CustomEvent('aerotwin:zoom',{detail:{zoom}}));}
   function setFault(detail={}) {
     const severity=Number(detail.severity||0), issue=String(detail.issue||'').toLowerCase(); activeFault=severity>0;
     for(const [id,group] of Object.entries(sensors)){

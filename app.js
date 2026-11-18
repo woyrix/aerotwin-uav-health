@@ -1,7 +1,7 @@
 import { firebaseConfig } from './firebase-config.js';
 
 let auth=null, authFns=null, dbFns=null, appInstance=null, currentUser=null, signedIn=false, firebaseReady=null, firebaseInitMessage='';
-let fleet=[], selected=0, simulationRunning=true, faultActive=false, simulatorUpdate=null, fleetUnsubscribe=null;
+let fleet=[], selected=0, simulationRunning=true, faultActive=false, simulatorUpdate=null, fleetUnsubscribe=null, activeFaultMode='nominal';
 let fleetSaveTimer=null, chatHistory=[], chatTurns=[], sendingChat=false, buzzerTimer=null, dashboardFilter='all';
 const GEMINI_API_KEY=window.AEROTWIN_GEMINI_API_KEY||'';
 const WOYRIX_MODELS=['gemini-3.5-flash','gemini-3.5-flash-lite','gemini-3.6-flash','gemini-3.8-flash'];
@@ -93,7 +93,7 @@ function renderDashboard(){
   if($('fleetHealthNote'))$('fleetHealthNote').textContent=avgHealth===null?'No telemetry yet':`${fleet.filter(a=>numeric(a.health)!==null).length} aircraft with estimates`;
   if($('alertContextLabel'))$('alertContextLabel').textContent=`${faulted.length} current`;
   if($('updatedAtLabel'))$('updatedAtLabel').textContent=`Updated ${new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}`;
-  const barHost=$('healthBars');if(barHost){const measured=fleet.filter(a=>numeric(a.health)!==null);barHost.innerHTML=measured.length?measured.map(a=>`<div class="health-bar-row"><span><b>${esc(a.id)}</b> ${esc(a.name)}</span><div class="health-bar-track"><i style="width:${a.health}%;--bar:${a.health<70?'#b54738':a.health<82?'#a46b21':'#39769a'}"></i></div><strong>${a.health}%</strong></div>`).join(''):'<div class="health-bars-empty">Add an aircraft and run a simulator session to see calculated health here.</div>'}
+  const barHost=$('healthBars');if(barHost){const measured=fleet.filter(a=>numeric(a.health)!==null);barHost.innerHTML=measured.length?`<div class="fleet-chart-grid">${[['HEALTH','health','#276d9a'],['MISSION RELIABILITY','reliability','#66836f']].map(([title,key,color])=>`<article class="fleet-chart"><h3>${title}</h3><div class="fleet-chart-rows">${measured.map(a=>{const value=numeric(a[key]);return `<div class="fleet-chart-row" title="${esc(a.id)} · ${value??'No estimate'}%"><span>${esc(a.id)}</span><div><i style="width:${value??0}%;--chart-color:${color}"></i></div><b>${value===null?'—':`${value}%`}</b></div>`}).join('')}</div></article>`).join('')}</div>`:'<div class="health-bars-empty">Run a simulator session to create current health and reliability estimates. No sample history is shown.</div>'}
   const alerts=$('alertList');if(alerts){alerts.innerHTML=faulted.length?faulted.map(a=>`<div class="alert-item"><div class="alert-symbol ${a.status}">${a.status==='attention'?'!':'△'}</div><div class="alert-copy"><b>${esc(a.id)} · ${esc(a.issue||'Fault signal detected')}</b><p>${a.source==='simulated'?'Simulator estimate':'Aircraft telemetry'} <span>·</span> ${esc(a.last||'Updated recently')}</p><div class="alert-actions"><button data-view="${fleet.indexOf(a)}">Inspect aircraft <span>↗</span></button><button class="dismiss-alert">Dismiss</button></div></div><span class="risk ${(a.risk||'Unknown').toLowerCase()}"><i></i>${esc(a.risk||'Unknown')}</span></div>`).join(''):'<div class="empty-alerts"><span>✓</span><b>All clear</b><p>No active fault signals in the saved fleet.</p></div>';alerts.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>showAircraft(Number(b.dataset.view)));alerts.querySelectorAll('.dismiss-alert').forEach(b=>b.onclick=()=>{b.closest('.alert-item').remove();toast('Alert hidden until the fleet refreshes')})}
   if($('currentDate'))$('currentDate').textContent=new Intl.DateTimeFormat('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric',timeZone:'Asia/Kolkata'}).format(new Date()).toUpperCase();
 }
@@ -112,6 +112,10 @@ function playBuzzer(){try{const C=window.AudioContext||window.webkitAudioContext
 function setAudibleAlerts(on){$('buzzerToggle')?.classList.toggle('on',on);if($('buzzerState'))$('buzzerState').textContent=on?'On':'Off';clearInterval(buzzerTimer);if(on){playBuzzer();buzzerTimer=setInterval(()=>{if(fleet.some(a=>hasFault(a)))playBuzzer()},9000)}}
 
 document.addEventListener('DOMContentLoaded',()=>{
+  const themeButton=$('themeToggle'),systemTheme=matchMedia('(prefers-color-scheme: dark)');
+  const syncThemeButton=()=>{if(themeButton){const dark=document.documentElement.dataset.theme==='dark';themeButton.textContent=dark?'Light mode':'Dark mode';themeButton.setAttribute('aria-pressed',String(dark))}};
+  syncThemeButton();themeButton?.addEventListener('click',()=>{document.documentElement.dataset.theme=document.documentElement.dataset.theme==='dark'?'light':'dark';localStorage.setItem('aerotwin-theme',document.documentElement.dataset.theme);syncThemeButton()});
+  systemTheme.addEventListener?.('change',event=>{if(!localStorage.getItem('aerotwin-theme')){document.documentElement.dataset.theme=event.matches?'dark':'light';syncThemeButton()}});
   firebaseReady=configureFirebase();
   window.addEventListener('storage',e=>{if(currentUser&&e.key===localFleetKey()){try{fleet=JSON.parse(e.newValue||'[]')}catch{fleet=[]}renderDashboard()}});
   if($('loginForm')){
@@ -148,13 +152,15 @@ function initSimulator(){
   document.querySelectorAll('.axis-controls button').forEach(b=>b.onclick=()=>window.dispatchEvent(new CustomEvent('aerotwin:rotate-axis',{detail:{axis:b.dataset.axis,amount:Number(b.dataset.step)*.22}})));
   $('zoomIn').onclick=()=>{zoom=Math.min(1.85,zoom+.12);updateModel()};$('zoomOut').onclick=()=>{zoom=Math.max(.55,zoom-.12);updateModel()};
   $('resetControls').onclick=()=>{for(const [id,val] of Object.entries({throttle:68,ambient:24,load:72,altitude:1200,vibrationControl:2.4})){$(id).value=val;$(id).dispatchEvent(new Event('input'))}};
+  document.querySelectorAll('[data-fault]').forEach(button=>button.onclick=()=>{activeFaultMode=button.dataset.fault;document.querySelectorAll('[data-fault]').forEach(item=>item.classList.toggle('active',item===button));if($('faultModeLabel'))$('faultModeLabel').textContent=activeFaultMode==='nominal'?'NOMINAL':button.textContent.toUpperCase();simulatorUpdate?.()});
   const update=()=>{
     const throttle=+$('throttle').value,ambient=+$('ambient').value,load=+$('load').value,altitude=+$('altitude').value,vibration=+$('vibrationControl').value;
-    const cylinderTemperature=Math.round(ambient+76+throttle*.55+load*.32),rpm=Math.round(900+throttle*33),oilPressure=Math.max(18,Math.round(52+load*.15-vibration*1.2));
-    const fuelFlow=Number((.8+throttle*.043).toFixed(1)),fuelPressure=Number((3.8+throttle*.008).toFixed(1)),exhaustTemperature=Math.round(cylinderTemperature*1.65),manifoldPressure=Math.round(87+throttle*.13-altitude*.001),airspeed=Math.round(18+throttle*.49-altitude*.001),oilTemperature=Math.round(ambient+48+load*.23);
-    const telemetry={throttle,rpm,exhaustTemperature,cylinderTemperature,oilTemperature,oilPressure,vibration,fuelFlow,fuelPressure,manifoldPressure,airspeed,engineLoad:load,ambientTemperature:ambient,altitude,timestamp:new Date().toISOString(),source:'simulated'};
-    const vals={throttleVal:throttle,ambientVal:ambient,loadVal:load,altitudeVal:altitude.toLocaleString(),vibrationControlVal:vibration.toFixed(1),stageTemp:cylinderTemperature};for(const [id,v] of Object.entries(vals))if($(id))$(id).textContent=v;
-    if($('telemetryGrid'))$('telemetryGrid').innerHTML=[['RPM',rpm.toLocaleString(),'rpm'],['EXHAUST TEMP',exhaustTemperature,'°C'],['CYLINDER TEMP',cylinderTemperature,'°C'],['OIL TEMP',oilTemperature,'°C'],['OIL PRESSURE',oilPressure,'psi'],['VIBRATION',vibration.toFixed(1),'mm/s'],['FUEL FLOW',fuelFlow,'L/h'],['FUEL PRESSURE',fuelPressure,'bar'],['MANIFOLD PRESSURE',manifoldPressure,'kPa'],['AIRSPEED',airspeed,'m/s']].map(([n,v,u])=>`<div class="telemetry-cell"><span>${n}</span><b>${v}<small> ${u}</small></b></div>`).join('');
+    const heat=activeFaultMode==='overheat',oilFault=activeFaultMode==='oil',vibrationFault=activeFaultMode==='vibration',fuelFault=activeFaultMode==='fuel',speedFault=activeFaultMode==='overspeed';
+    const cylinderTemperature=Math.round(ambient+76+throttle*.55+load*.32+(heat?72:0)),rpm=Math.round(900+throttle*33+(speedFault?1450:0)),oilPressure=oilFault?14:Math.max(18,Math.round(52+load*.15-vibration*1.2));
+    const fuelFlow=Number((fuelFault?Math.max(.2,.8+throttle*.043-1.1):.8+throttle*.043).toFixed(1)),fuelPressure=fuelFault?1.2:Number((3.8+throttle*.008).toFixed(1)),exhaustTemperature=Math.round(cylinderTemperature*1.65+(heat?150:0)),manifoldPressure=Math.round(87+throttle*.13-altitude*.001),airspeed=Math.round(18+throttle*.49-altitude*.001),oilTemperature=Math.round(ambient+48+load*.23+(heat?28:0)),actualVibration= vibrationFault?7.8:vibration;
+    const telemetry={throttle,rpm,exhaustTemperature,cylinderTemperature,oilTemperature,oilPressure,vibration:actualVibration,fuelFlow,fuelPressure,manifoldPressure,airspeed,engineLoad:load,ambientTemperature:ambient,altitude,faultMode:activeFaultMode,timestamp:new Date().toISOString(),source:'simulated'};
+    const vals={throttleVal:throttle,ambientVal:ambient,loadVal:load,altitudeVal:altitude.toLocaleString(),vibrationControlVal:actualVibration.toFixed(1),stageTemp:cylinderTemperature};for(const [id,v] of Object.entries(vals))if($(id))$(id).textContent=v;
+    if($('telemetryGrid'))$('telemetryGrid').innerHTML=[['RPM',rpm.toLocaleString(),'rpm'],['EXHAUST TEMP',exhaustTemperature,'°C'],['CYLINDER TEMP',cylinderTemperature,'°C'],['OIL TEMP',oilTemperature,'°C'],['OIL PRESSURE',oilPressure,'psi'],['VIBRATION',actualVibration.toFixed(1),'mm/s'],['FUEL FLOW',fuelFlow,'L/h'],['FUEL PRESSURE',fuelPressure,'bar'],['MANIFOLD PRESSURE',manifoldPressure,'kPa'],['AIRSPEED',airspeed,'m/s']].map(([n,v,u])=>`<div class="telemetry-cell"><span>${n}</span><b>${v}<small> ${u}</small></b></div>`).join('');
     updateAircraftHealth({telemetry});
   };
   simulatorUpdate=update;document.querySelectorAll('.control-group input').forEach(el=>el.addEventListener('input',update));
@@ -168,12 +174,16 @@ function updateAircraftHealth({telemetry}){
   const a=fleet[selected];if(!a||!telemetry)return;
   const {cylinderTemperature:temp,oilPressure,vibration,throttle,engineLoad}=telemetry;let severity=0;const faults=[];
   if(temp>180){severity+=Math.min(.6,(temp-180)*.025);faults.push('Elevated cylinder temperature')}
+  if(telemetry.exhaustTemperature>620){severity+=Math.min(.45,(telemetry.exhaustTemperature-620)*.006);faults.push('High exhaust temperature')}
+  if(telemetry.oilTemperature>105){severity+=Math.min(.35,(telemetry.oilTemperature-105)*.012);faults.push('High oil temperature')}
   if(vibration>5){severity+=Math.min(.65,(vibration-5)*.14);faults.push('Excessive engine vibration')}
   if(oilPressure<28){severity+=Math.min(.55,(28-oilPressure)*.04);faults.push('Low oil pressure')}
+  if(telemetry.fuelPressure<2.5){severity+=.42;faults.push('Low fuel pressure')}
+  if(telemetry.rpm>4300){severity+=.3;faults.push('Engine overspeed')}
   if(throttle>95&&engineLoad>90){severity+=.18;if(!faults.length)faults.push('Engine operating near maximum load')}
   severity=Math.min(1,severity);
   a.health=Math.max(22,100-Math.round(severity*65));a.rul=Math.max(12,250-Math.round(severity*180));a.reliability=Math.max(55,100-Math.round(severity*28));
-  a.status=severity===0?'healthy':severity>=.45?'attention':'watch';a.risk=severity>=.65?'High':severity>0?'Moderate':'Low';a.issue=faults.join(' · ')||'All monitored values within simulator thresholds';a.faults=faults;a.last=`Simulated · ${new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}`;a.source='simulated';a.telemetry=telemetry;a.simulation={severity,inputs:{throttle,engineLoad,ambientTemperature:telemetry.ambientTemperature,altitude:telemetry.altitude,vibration}};
+  a.status=severity===0?'healthy':severity>=.45?'attention':'watch';a.risk=severity>=.65?'High':severity>0?'Moderate':'Low';a.issue=faults.join(' · ')||'All monitored values within simulator thresholds';a.faults=faults;a.last=`Simulated · ${new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}`;a.source='simulated';a.telemetry=telemetry;a.simulation={severity,inputs:{throttle,engineLoad,ambientTemperature:telemetry.ambientTemperature,altitude:telemetry.altitude,vibration,faultMode:activeFaultMode}};
   faultActive=severity>0;$('faultBtn')?.classList.toggle('active',faultActive);window.dispatchEvent(new CustomEvent('aerotwin:fault',{detail:{severity,issue:a.issue}}));
   const pill=document.querySelector('.twin-name-line .status-pill');if(pill){pill.className=`status-pill ${severity===0?'healthy':'warning'}`;pill.innerHTML=`<i></i>${severity===0?'Systems nominal':severity>=.45?'Fault detected':'Monitor'}`}
   renderUavList();clearTimeout(fleetSaveTimer);fleetSaveTimer=setTimeout(()=>persistFleet(),500);
@@ -186,7 +196,7 @@ function renderUavList(){
 function renderSelectedUav(){
   const a=fleet[selected];if(!a)return;
   $('twinName').textContent=`${a.id} · ${a.name}`;$('twinMeta').innerHTML=`${esc((a.type||'UAV').toUpperCase())} <span>·</span> UAV ID ${esc(a.id)} <span>·</span> PASSKEY ${esc(a.passkey||'')}`;
-  const inputs=a.simulation?.inputs;for(const [id,key,fallback] of [['throttle','throttle',68],['load','engineLoad',72],['ambient','ambientTemperature',24],['altitude','altitude',1200],['vibrationControl','vibration',2.4]])if($(id))$(id).value=numeric(inputs?.[key])??fallback;
+  const inputs=a.simulation?.inputs;activeFaultMode=inputs?.faultMode||'nominal';document.querySelectorAll('[data-fault]').forEach(button=>button.classList.toggle('active',button.dataset.fault===activeFaultMode));const activePreset=document.querySelector(`[data-fault="${activeFaultMode}"]`);if($('faultModeLabel'))$('faultModeLabel').textContent=activeFaultMode==='nominal'?'NOMINAL':activePreset?.textContent.toUpperCase()||'NOMINAL';for(const [id,key,fallback] of [['throttle','throttle',68],['load','engineLoad',72],['ambient','ambientTemperature',24],['altitude','altitude',1200],['vibrationControl','vibration',2.4]])if($(id))$(id).value=numeric(inputs?.[key])??fallback;
   faultActive=hasFault(a);$('faultBtn').classList.toggle('active',faultActive);window.dispatchEvent(new CustomEvent('aerotwin:fault',{detail:{severity:a.simulation?.severity||0,issue:a.issue||''}}));simulatorUpdate?.();
 }
 
@@ -194,6 +204,7 @@ function initChat(){
   $('chatToggle').onclick=()=>{$('chatPanel').classList.toggle('hidden');if(!$('chatPanel').classList.contains('hidden'))$('chatInput').focus()};
   $('chatClose').onclick=()=>$('chatPanel').classList.add('hidden');
   $('chatForm').onsubmit=sendChatMessage;
+  $('chatInput').addEventListener('keydown',event=>{if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();$('chatForm').requestSubmit()}});
 }
 function renderChatHistory(){
   const host=$('chatMessages');const visible=chatHistory.slice(-20);host.innerHTML='<div class="chat-welcome"><b>Woyrix here.</b><p>Ask me anything. If you ask about aircraft condition, I’ll use the latest fleet telemetry.</p></div>'+visible.map(m=>`<div class="chat-message ${m.role==='user'?'user':'assistant'}"><div>${formatChatText(m.text)}</div></div>`).join('');host.scrollTop=host.scrollHeight;

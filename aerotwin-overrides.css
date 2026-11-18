@@ -11,3 +11,71 @@ body,.sim-body{background:#f3f5f7;color:#17232e;-webkit-font-smoothing:antialias
 .firebase-help{font-size:10px;color:#67727d;text-align:center;line-height:1.6;margin:12px 0}.firebase-help a,.setup-page a{color:#075fae;text-decoration:underline;text-underline-offset:2px}.nav-button{width:100%;text-align:left;background:transparent;border:0;font-size:11px}.nav-button>span:first-child{width:15px}.risk.unknown{color:#687782}.metric-note{color:#65727d;font-size:9px}.health-bars{padding:12px 17px 15px;display:flex;flex-direction:column;gap:11px}.health-bar-row{display:grid;grid-template-columns:minmax(145px,220px) 1fr 42px;gap:12px;align-items:center;font-size:10px;color:#455d6e}.health-bar-row b{color:#23465f}.health-bar-row strong{text-align:right;font:10px var(--mono);color:#29485e}.health-bar-track{height:7px;background:#e1e6e9;border-radius:0}.health-bar-track i{display:block;height:100%;background:var(--bar)}.health-bars-empty{font-size:11px;color:#677783;padding:15px 0}.alert-symbol.warning,.alert-symbol.watch{background:#f3f0df;color:#7c6b2b}
 .chat-panel{position:fixed;z-index:30;right:24px;bottom:24px;width:min(390px,calc(100vw - 32px));height:min(600px,calc(100vh - 50px));background:#fff;border:1px solid #bfcbd2;box-shadow:0 12px 42px #18314230;display:flex;flex-direction:column}.chat-header{height:58px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 14px;border-bottom:1px solid #d9e0e4}.chat-header>div:first-child{display:flex;flex-direction:column;gap:3px}.chat-kicker{color:#647785;font:8px var(--mono);letter-spacing:1px}.chat-header strong{font:600 14px var(--display);color:#1e4661}.chat-header>div:last-child{display:flex;align-items:center;gap:8px}.chat-settings,.chat-close,.chat-key-close{border:1px solid #cbd4da;background:#fff;color:#31566e;border-radius:2px}.chat-settings{font-size:9px;padding:6px 8px}.chat-close,.chat-key-close{height:27px;width:27px;font-size:17px}.chat-messages{padding:13px;flex:1;overflow:auto;display:flex;flex-direction:column;gap:9px}.chat-welcome{font-size:11px;color:#344f61;background:#f2f6f8;border:1px solid #e0e6e9;padding:11px}.chat-welcome b{color:#1f4b69}.chat-welcome p{line-height:1.5;margin:5px 0 0}.chat-message{display:flex;max-width:92%;font-size:11px;line-height:1.55;color:#2e4859}.chat-message>div{padding:9px 11px;background:#f1f4f6;border:1px solid #e1e6e9;white-space:normal;overflow-wrap:anywhere}.chat-message.user{align-self:flex-end;color:#173e5a}.chat-message.user>div{background:#e8f1f8;border-color:#d4e2ec}.chat-form{display:flex;gap:7px;padding:10px;border-top:1px solid #d9e0e4}.chat-form textarea{flex:1;min-width:0;resize:none;border:1px solid #bdc8d0;background:#fff;color:#203d52;padding:8px;font:11px var(--sans);outline:none}.chat-form textarea:focus{border-color:#075fae}.chat-form button{align-self:stretch;border:0;background:#075fae;color:#fff;padding:0 11px;font-size:10px}.chat-form.sending button{opacity:.55}.chat-privacy{padding:0 11px 9px;color:#75828b;font-size:8px}.chat-key-overlay{position:fixed;z-index:40;inset:0;background:#12253666;display:grid;place-items:center;padding:16px}.chat-key-dialog{position:relative;width:min(410px,100%);background:#fff;border:1px solid #bac6ce;padding:23px}.chat-key-close{position:absolute;top:12px;right:12px}.chat-key-dialog h2{font:600 20px var(--display);color:#173e5d;margin:9px 0}.chat-key-dialog p,.chat-key-dialog small{font-size:10px;line-height:1.55;color:#687782}.chat-key-dialog label{display:block;margin:16px 0 6px;color:#304e63;font-size:10px}.chat-key-dialog input{width:100%;height:38px;border:1px solid #b9c4cc;padding:0 9px}.chat-key-actions{display:flex;justify-content:space-between;align-items:center;margin:12px 0}.chat-key-actions a{font-size:10px;color:#075fae;text-decoration:underline}.chat-key-actions .button{height:34px}.chat-key-dialog small{display:block;border-top:1px solid #e0e5e8;padding-top:9px}.setup-body{min-height:100vh;background:#f3f5f7}.setup-page{max-width:760px;margin:0 auto;padding:34px 24px 55px}.setup-page>.brand{margin-bottom:35px}.setup-page>.eyebrow{font-size:9px}.setup-page h1{font:600 29px var(--display);color:#173e5d;margin:9px 0}.setup-lead{font-size:13px;color:#63727d;line-height:1.7;margin-bottom:25px}.setup-steps{padding-left:21px}.setup-steps li{padding:0 0 14px 8px;color:#075fae}.setup-steps h2{font:600 14px var(--display);color:#244862;margin:0 0 5px}.setup-steps p{font-size:11px;line-height:1.7;color:#566a78;margin:0}.setup-page code{background:#e8edf1;border:1px solid #d8dfe4;padding:2px 4px;color:#264c68;font:10px var(--mono)}.setup-note{padding:13px;border:1px solid #cbd5dc;background:#fff;font-size:10px;line-height:1.7;color:#506473;margin-top:12px}.setup-safety{font-size:9px;color:#687782;line-height:1.6;margin:16px 0}.setup-back{margin-top:3px}.empty-alerts p{color:#687782}
 @media(max-width:600px){.chat-panel{right:8px;bottom:8px;width:calc(100vw - 16px);height:min(580px,calc(100vh - 16px))}.health-bar-row{grid-template-columns:95px 1fr 36px;gap:7px}.setup-page{padding:22px 17px 40px}}
+/* Readability, theme controls and current-snapshot charts */
+body{zoom:1.12}
+.theme-toggle{border:1px solid #c7d0d7;background:transparent;color:#34536b;padding:7px 10px;font-size:12px;border-radius:2px;white-space:nowrap}
+.theme-toggle:hover{background:#edf2f5}
+.user-profile{justify-content:flex-start;min-height:42px;padding:10px 12px;border:1px solid #d6dde2;background:#fff;color:#25445e;font-size:13px;font-weight:600;cursor:pointer}
+.user-profile:hover{background:#eef3f7;border-color:#b9c7d0}
+.aircraft-row:hover td{background:#e9f0f5;color:#203d52}
+.aircraft-row:hover .aircraft-cell b,.aircraft-row:hover .mono,.aircraft-row:hover .reliability-cell>b{color:#173e5d}
+.aircraft-row:hover .aircraft-cell small,.aircraft-row:hover .last-flight,.aircraft-row:hover .mono small{color:#496274}
+.fleet-charts{padding:8px 16px 17px}
+.fleet-chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+.fleet-chart h3{margin:7px 0 12px;font:10px var(--mono);letter-spacing:.7px;color:#637783}
+.fleet-chart-rows{display:flex;flex-direction:column;gap:11px}
+.fleet-chart-row{display:grid;grid-template-columns:58px minmax(80px,1fr) 42px;align-items:center;gap:9px;color:#37566b;font-size:11px}
+.fleet-chart-row>span{font:10px var(--mono);overflow:hidden;text-overflow:ellipsis}
+.fleet-chart-row>div{height:9px;background:#e6ebee;border:1px solid #d6dfe4}
+.fleet-chart-row>div i{display:block;height:100%;background:var(--chart-color)}
+.fleet-chart-row>b{text-align:right;font:10px var(--mono);color:#24465d}
+.fault-presets>p{font-size:11px;line-height:1.45;color:#72818a;margin:8px 0}
+.fault-mode-label{font:9px var(--mono);color:#587487;letter-spacing:.7px}
+.fault-preset-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.fault-preset-grid button{min-height:31px;border:1px solid #cbd5db;background:#fff;color:#456174;font-size:11px;text-align:left;padding:5px 8px}
+.fault-preset-grid button:hover{border-color:#50748b;background:#f2f6f8}
+.fault-preset-grid button.active{border-color:#276d9a;background:#eaf1f5;color:#174e70;font-weight:600}
+html[data-theme="dark"] body{background:#111820;color:#e5e9ec}
+html[data-theme="dark"] .sidebar,html[data-theme="dark"] .topbar,html[data-theme="dark"] .panel,html[data-theme="dark"] .summary-card,html[data-theme="dark"] .chat-panel{background:#18212a;color:#e5e9ec;border-color:#303b44}
+html[data-theme="dark"] .sidebar>.brand,html[data-theme="dark"] .topbar,html[data-theme="dark"] .panel-header,html[data-theme="dark"] .twin-head{border-color:#303b44}
+html[data-theme="dark"] .main-content,html[data-theme="dark"] .setup-body{background:#111820}
+html[data-theme="dark"] .brand,html[data-theme="dark"] .workspace-name,html[data-theme="dark"] .breadcrumb b,html[data-theme="dark"] .panel-header h2,html[data-theme="dark"] .summary-value,html[data-theme="dark"] .aircraft-cell b,html[data-theme="dark"] .health-cell>b,html[data-theme="dark"] .reliability-cell>b,html[data-theme="dark"] .fleet-chart-row>b,html[data-theme="dark"] .chat-header strong,html[data-theme="dark"] .chat-welcome b{color:#e5e9ec}
+html[data-theme="dark"] .workspace-label,html[data-theme="dark"] .nav-label,html[data-theme="dark"] .breadcrumb,html[data-theme="dark"] .panel-header p,html[data-theme="dark"] .muted,html[data-theme="dark"] .metric-note,html[data-theme="dark"] .summary-foot,html[data-theme="dark"] .foot-right,html[data-theme="dark"] .fleet-chart h3{color:#aab6be}
+html[data-theme="dark"] .nav-item{color:#c1cbd1}
+html[data-theme="dark"] .nav-item.active{background:#263644;color:#eef2f4}
+html[data-theme="dark"] .workspace-name,html[data-theme="dark"] .user-profile,html[data-theme="dark"] .system-card,html[data-theme="dark"] .chat-welcome,html[data-theme="dark"] .chat-message>div,html[data-theme="dark"] .chat-form textarea{background:#202b35;color:#e3e9ed;border-color:#3b4852}
+html[data-theme="dark"] .user-profile{justify-content:flex-start}
+html[data-theme="dark"] .chat-message.user>div{background:#293b4a;color:#edf3f7;border-color:#3c5262}
+html[data-theme="dark"] .chat-form,html[data-theme="dark"] .chat-header{border-color:#3b4852}
+html[data-theme="dark"] .chat-privacy{color:#a5b0b7}
+html[data-theme="dark"] .theme-toggle,html[data-theme="dark"] .icon-button,html[data-theme="dark"] .button-outline,html[data-theme="dark"] .fault-preset-grid button{background:#202b35;color:#e4eaee;border-color:#43515d}
+html[data-theme="dark"] .theme-toggle:hover,html[data-theme="dark"] .fault-preset-grid button:hover{background:#2b3944}
+html[data-theme="dark"] .fault-preset-grid button.active{background:#263e50;border-color:#6c98b5;color:#f1f5f7}
+html[data-theme="dark"] .aircraft-row:hover td{background:#273642;color:#f1f5f7}
+html[data-theme="dark"] .aircraft-row:hover .aircraft-cell b,html[data-theme="dark"] .aircraft-row:hover .mono,html[data-theme="dark"] .aircraft-row:hover .reliability-cell>b{color:#fff}
+html[data-theme="dark"] .aircraft-row:hover .aircraft-cell small,html[data-theme="dark"] .aircraft-row:hover .last-flight,html[data-theme="dark"] .aircraft-row:hover .mono small{color:#d0dbe1}
+html[data-theme="dark"] .fleet-chart-row{color:#d1dbe0}
+html[data-theme="dark"] .fleet-chart-row>div{background:#303c46;border-color:#45525d}
+html[data-theme="dark"] .fault-presets>p{color:#aab6be}
+html[data-theme="dark"] .user-profile:hover{background:#2b3944}
+@media(max-width:700px){body{zoom:1}.fleet-chart-grid{grid-template-columns:1fr;gap:10px}}
+html[data-theme="light"] .sim-body{background:#edf1f4;color:#18374d}
+html[data-theme="light"] .sim-topbar{background:#fff;border-color:#d5dde2}
+html[data-theme="light"] .sim-title{border-color:#d3dbe0}
+html[data-theme="light"] .sim-title b,html[data-theme="light"] .sim-rail h2,html[data-theme="light"] .twin-head h2,html[data-theme="light"] .control-head h2{color:#173e5d}
+html[data-theme="light"] .sim-rail,html[data-theme="light"] .twin-panel,html[data-theme="light"] .control-panel{background:#fff;border-color:#d0d9df}
+html[data-theme="light"] .uav-select{color:#2c4c61}
+html[data-theme="light"] .uav-select.selected,html[data-theme="light"] .mini-aircraft{background:#eaf1f5;border-color:#c7d8e1;color:#174e70}
+html[data-theme="light"] .uav-select small,html[data-theme="light"] .twin-head p,html[data-theme="light"] .rail-note small{color:#637783}
+html[data-theme="light"] .control-head,html[data-theme="light"] .sim-rail-head,html[data-theme="light"] .twin-head,html[data-theme="light"] .sensor-strip{border-color:#d8e0e5}
+html[data-theme="light"] .control-label,html[data-theme="light"] .control-label label,html[data-theme="light"] .sensor-group-head{color:#31546b}
+html[data-theme="light"] .telemetry-cell{background:#f4f7f8;border-color:#dce3e7;color:#526977}
+html[data-theme="light"] .telemetry-cell b{color:#183e58}
+html[data-theme="light"] .control-bottom,html[data-theme="light"] .rail-note{border-color:#d8e0e5;color:#5e7482}
+html[data-theme="light"] .control-bottom p{color:#607581}
+html[data-theme="light"] .reset-link{color:#27658b}
+html[data-theme="light"] .sim-footer{color:#647783}
+html[data-theme="light"] .sim-top-right .sim-state{color:#466c60}
+html[data-theme="light"] .axis-controls button,html[data-theme="light"] .zoom-controls button{background:#fff;color:#244c67;border-color:#bdcbd4}
+html[data-theme="light"] .stage-control{color:#e4edf0}
+@media(max-width:700px){.sim-layout{grid-template-columns:1fr}.sim-main{padding:15px}}

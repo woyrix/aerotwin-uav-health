@@ -101,20 +101,27 @@ function startTwin(T, host) {
     return holder;
   }
 
-  // Swept fixed-wing airframe with a transparent inspection skin.
+  // Long-endurance MALE airframe: high aspect-ratio wing, twin tail booms and rear pusher.
   loftFuselage([[ -2.55,.055,.06],[-2.25,.14,.14],[-1.72,.21,.2],[-.85,.29,.26],[0,.32,.29],[.72,.28,.26],[1.42,.2,.19],[1.9,.12,.12],[2.23,.035,.04]], shellMat);
-  planform([[-4.8,-.15],[-.78,.47],[.55,.47],[4.8,-.15],[4.55,-.38],[.63,-.62],[-.68,-.62],[-4.55,-.38]], wingMat, -0.015, .095, 'Main translucent wing');
-  planform([[-1.37,-1.95],[-.45,-1.67],[.45,-1.67],[1.37,-1.95],[1.24,-2.17],[-1.24,-2.17]], wingMat, 0.01, .07, 'Tailplane');
-  const finShape = new T.Shape(); finShape.moveTo(1.68, .04); finShape.lineTo(2.24, .9); finShape.lineTo(2.14, .06); finShape.lineTo(1.91, -.04); finShape.closePath();
-  const finGeo = new T.ExtrudeGeometry(finShape, { depth: .11, bevelEnabled: true, bevelSegments: 2, bevelSize: .025, bevelThickness: .025 }); finGeo.rotateY(Math.PI / 2);
-  const fin = addMesh(finGeo, wingMat, airframe, 'Vertical stabilizer'); fin.position.x = -.055;
+  planform([[-5.15,-.22],[-4.55,.34],[4.55,.34],[5.15,-.22],[4.85,-.53],[-4.85,-.53]], wingMat, -0.015, .095, 'High aspect-ratio main wing');
+  planform([[-1.12,-2.12],[1.12,-2.12],[1.02,-2.38],[-1.02,-2.38]], wingMat, 0.015, .075, 'Straight tailplane');
+  // Twin tail booms lead from the main wing to separate vertical stabilizers.
+  [-.68,.68].forEach(x=>{
+    tube(airframe,[[x,.035,-.18],[x*1.05,.045,-1.12],[x*1.12,.065,-2.25]],.075,innerMat,'Twin tail boom');
+    const finShape=new T.Shape();finShape.moveTo(-2.35,.06);finShape.lineTo(-2.02,.72);finShape.lineTo(-1.92,.07);finShape.closePath();
+    const finGeo=new T.ExtrudeGeometry(finShape,{depth:.075,bevelEnabled:true,bevelSegments:2,bevelSize:.02,bevelThickness:.02});finGeo.rotateY(Math.PI/2);
+    const fin=addMesh(finGeo,wingMat,airframe,'Twin-boom vertical stabilizer');fin.position.x=x-.0375;
+  });
   // Spars, ribs and control surfaces give the airframe depth and construction detail.
   [-3.65,-2.75,-1.8,-.9,0,.9,1.8,2.75,3.65].forEach(x => tube(airframe, [[x,-.005,-.42],[x*.82,-.005,-.02],[x*.32,-.005,.32]], .012, innerMat, 'Wing rib'));
   tube(airframe, [[-4.4,-.04,-.32],[0,-.04,-.49],[4.4,-.04,-.32]], .026, darkMat, 'Main wing spar');
   tube(airframe, [[-1.1,.02,-2.07],[0,.02,-2.07],[1.1,.02,-2.07]], .025, darkMat, 'Tail spar');
-  // Canopy and nose pitot probe.
-  const canopy = addMesh(new T.SphereGeometry(1, 24, 16), new T.MeshPhysicalMaterial({ color: 0x7e9cab, roughness: .16, metalness: .26, transparent: true, opacity: .38, clearcoat: .8, side: T.DoubleSide }), airframe, 'Inspection canopy');
-  canopy.scale.set(.2,.17,.63); canopy.position.set(0,.21,.72);
+  // No pilot canopy: the nose carries an optical payload turret typical of an unmanned aircraft.
+  const turret=addMesh(new T.SphereGeometry(.24,24,16),new T.MeshPhysicalMaterial({color:0x718893,roughness:.2,metalness:.42,clearcoat:.7}),airframe,'EO/IR sensor turret');turret.scale.set(1,.72,1);turret.position.set(0,-.24,1.55);
+  addMesh(new T.SphereGeometry(.11,18,12),mat('#283c45',.16,.28,{emissive:'#17313a',emissiveIntensity:.18}),airframe,'Optical sensor lens').scale.set(.8,.8,.45);
+  const lens=airframe.children.at(-1);lens.position.set(0,-.28,1.75);
+  addCylinder(airframe,'Dorsal satellite antenna',.035,.06,.22,[0,.28,-.12],innerMat,[0,0,0],12);
+  // Nose pitot probe.
   addCylinder(airframe, 'Pitot probe', .025,.018,.62,[0,.02,2.45],metalMat,[Math.PI/2,0,0],12);
   addMesh(new T.SphereGeometry(.045,12,8), mat('#879da6',.2,.75), airframe, 'Pitot tip').position.set(0,.02,2.77);
 
@@ -185,7 +192,7 @@ function startTwin(T, host) {
   function setFault(detail={}) {
     const severity=Number(detail.severity||0), issue=String(detail.issue||'').toLowerCase(); activeFault=severity>0;
     for(const [id,group] of Object.entries(sensors)){
-      const m=group.userData.material; const affected=activeFault && (id==='cht'||id==='exhaust'||id==='oil'&&issue.includes('oil')||id==='vibration'&&issue.includes('vibration')||id==='fuelFlow'&&issue.includes('fuel'));
+      const m=group.userData.material; const affected=activeFault && ((id==='cht'||id==='exhaust')&&(/temperature|overheat/.test(issue))||id==='oil'&&issue.includes('oil')||id==='vibration'&&issue.includes('vibration')||(id==='fuelFlow'||id==='fuelPressure')&&issue.includes('fuel'));
       m.color.set(affected?faultSensor:normalSensor);m.emissive.set(affected?faultSensor:normalSensor);m.emissiveIntensity=affected ? 0.95 : 0.14;
     }
     engineParts.forEach(part=>{part.material.color.set(activeFault?faultSensor:0x263740);if(part.material.emissive)part.material.emissive.set(activeFault?0x631c19:0x000000);});

@@ -145,12 +145,13 @@ function initSimulator(){
   };
   $('pauseSim').onclick=()=>{simulationRunning=!simulationRunning;$('pauseSim').innerHTML=simulationRunning?'Ⅱ &nbsp;Pause':'▶ &nbsp;Resume';$('syncTime').textContent=simulationRunning?'SYNC ACTIVE':'PAUSED'};
   $('resetView').onclick=()=>{zoom=1;window.dispatchEvent(new CustomEvent('aerotwin:reset'));updateModel()};
+  window.addEventListener('aerotwin:zoom',event=>{zoom=event.detail.zoom;if($('zoomVal'))$('zoomVal').textContent=`${Math.round(zoom*100)}%`});
   $('fullscreen').onclick=()=>document.fullscreenElement?document.exitFullscreen():$('modelStage').requestFullscreen?.();
   $('rotateBtn').onclick=()=>{const b=$('rotateBtn');b.classList.toggle('active');rotatable=b.classList.contains('active');window.dispatchEvent(new CustomEvent('aerotwin:rotation-enabled',{detail:{enabled:rotatable}}))};
   $('labelsBtn').onclick=()=>{const b=$('labelsBtn');b.classList.toggle('active');window.dispatchEvent(new CustomEvent('aerotwin:labels',{detail:{visible:b.classList.contains('active')}}))};
   $('faultBtn').onclick=()=>toast(faultActive?'Fault area is highlighted on the 3D twin':'Raise engine load or vibration to create a fault');
   document.querySelectorAll('.axis-controls button').forEach(b=>b.onclick=()=>window.dispatchEvent(new CustomEvent('aerotwin:rotate-axis',{detail:{axis:b.dataset.axis,amount:Number(b.dataset.step)*.22}})));
-  $('zoomIn').onclick=()=>{zoom=Math.min(1.85,zoom+.12);updateModel()};$('zoomOut').onclick=()=>{zoom=Math.max(.55,zoom-.12);updateModel()};
+  $('zoomIn').onclick=()=>{zoom=Math.min(1.35,zoom+.1);updateModel()};$('zoomOut').onclick=()=>{zoom=Math.max(.7,zoom-.1);updateModel()};
   $('resetControls').onclick=()=>{for(const [id,val] of Object.entries({throttle:68,ambient:24,load:72,altitude:1200,vibrationControl:2.4})){$(id).value=val;$(id).dispatchEvent(new Event('input'))}};
   document.querySelectorAll('[data-fault]').forEach(button=>button.onclick=()=>{activeFaultMode=button.dataset.fault;document.querySelectorAll('[data-fault]').forEach(item=>item.classList.toggle('active',item===button));if($('faultModeLabel'))$('faultModeLabel').textContent=activeFaultMode==='nominal'?'NOMINAL':button.textContent.toUpperCase();simulatorUpdate?.()});
   const update=()=>{

@@ -16,7 +16,7 @@ function startTwin(T, host) {
   const scene = new T.Scene();
   scene.background = new T.Color('#090909');
   const camera = new T.PerspectiveCamera(36, 1, 0.1, 100);
-  const baseCamera = new T.Vector3(7.5, 6.2, 11.8);
+  const baseCamera = new T.Vector3(9, 7.2, 14.5);
   const renderer = new T.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   renderer.outputColorSpace = T.SRGBColorSpace;
@@ -87,7 +87,7 @@ function startTwin(T, host) {
     ctx.fillStyle = color; ctx.font = '600 29px Arial'; ctx.textBaseline = 'middle'; ctx.fillText(text.toUpperCase(), 18, 49);
     const texture = new T.CanvasTexture(canvas); texture.colorSpace = T.SRGBColorSpace;
     const sprite = new T.Sprite(new T.SpriteMaterial({ map: texture, transparent: true, depthTest: false }));
-    sprite.scale.set(1.45, 0.36, 1); sprite.position.set(...position); sprite.renderOrder = 6; twin.add(sprite); labels.push(sprite); return sprite;
+    sprite.scale.set(1.45, 0.36, 1); sprite.position.set(...position); sprite.renderOrder = 6; sprite.visible = false; twin.add(sprite); labels.push(sprite); return sprite;
   }
   function addSensor(id, label, position, size = 0.115) {
     const holder = new T.Group(); holder.name = `${label} sensor`; holder.position.set(...position); airframe.add(holder);
@@ -108,7 +108,7 @@ function startTwin(T, host) {
   // Twin tail booms lead from the main wing to separate vertical stabilizers.
   [-.68,.68].forEach(x=>{
     tube(airframe,[[x,.035,-.28],[x*1.04,.045,-1.45],[x*1.12,.065,-3.72]],.052,innerMat,'Twin tail boom');
-    const finShape=new T.Shape();finShape.moveTo(-3.98,.06);finShape.lineTo(-3.62,.72);finShape.lineTo(-3.53,.07);finShape.closePath();
+    const finShape=new T.Shape();finShape.moveTo(3.52,.06);finShape.lineTo(3.72,.66);finShape.lineTo(3.98,.66);finShape.lineTo(4.12,.06);finShape.closePath();
     const finGeo=new T.ExtrudeGeometry(finShape,{depth:.075,bevelEnabled:true,bevelSegments:2,bevelSize:.02,bevelThickness:.02});finGeo.rotateY(Math.PI/2);
     const fin=addMesh(finGeo,wingMat,airframe,'Twin-boom vertical stabilizer');fin.position.x=x-.0375;
   });
@@ -172,7 +172,7 @@ function startTwin(T, host) {
 
   const raycaster = new T.Raycaster(); const pointer = new T.Vector2();
   const pickable = Object.values(sensors).flatMap(s => s.children.filter(o => o.isMesh));
-  let zoom = 1, dragging = false, lastX = 0, lastY = 0, moved = false, rotateEnabled = true, showLabels = true, activeFault = null;
+  let zoom = 1, dragging = false, lastX = 0, lastY = 0, moved = false, rotateEnabled = true, showLabels = false, activeFault = null;
   function resize() {
     const w = Math.max(1, host.clientWidth), h = Math.max(1, host.clientHeight);
     renderer.setSize(w,h,false); camera.aspect = w/h; camera.updateProjectionMatrix();
@@ -188,7 +188,7 @@ function startTwin(T, host) {
   const stopDrag = e => { dragging=false; if(!moved){const rect=renderer.domElement.getBoundingClientRect();pointer.x=((e.clientX-rect.left)/rect.width)*2-1;pointer.y=-((e.clientY-rect.top)/rect.height)*2+1;raycaster.setFromCamera(pointer,camera);const hit=raycaster.intersectObjects(pickable,false)[0];if(hit){const info=hit.object.parent.userData;window.dispatchEvent(new CustomEvent('aerotwin:sensor-selected',{detail:{id:info.id,label:info.label}}));}} };
   renderer.domElement.addEventListener('pointerup',stopDrag); renderer.domElement.addEventListener('pointercancel',()=>dragging=false);
   renderer.domElement.addEventListener('wheel', e => {e.preventDefault();setZoom(zoom+(e.deltaY<0?.07:-.07));},{passive:false});
-  function setZoom(value){zoom=Math.min(1.85,Math.max(.55,value));updateCamera();window.dispatchEvent(new CustomEvent('aerotwin:zoom',{detail:{zoom}}));}
+  function setZoom(value){zoom=Math.min(1.35,Math.max(.7,value));updateCamera();window.dispatchEvent(new CustomEvent('aerotwin:zoom',{detail:{zoom}}));}
   function setFault(detail={}) {
     const severity=Number(detail.severity||0), issue=String(detail.issue||'').toLowerCase(); activeFault=severity>0;
     for(const [id,group] of Object.entries(sensors)){

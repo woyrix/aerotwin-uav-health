@@ -177,7 +177,7 @@ function startTwin(T, host) {
 
   const raycaster = new T.Raycaster(); const pointer = new T.Vector2();
   const pickable = Object.values(sensors).flatMap(s => s.children.filter(o => o.isMesh));
-  let zoom = 1, dragging = false, lastX = 0, lastY = 0, moved = false, rotateEnabled = true, showLabels = false, activeFault = null;
+  let zoom = 1, dragging = false, lastX = 0, lastY = 0, moved = false, rotateEnabled = true, showLabels = false, activeFault = null, propellerRpm = 900;
   function resize() {
     const w = Math.max(1, host.clientWidth), h = Math.max(1, host.clientHeight);
     renderer.setSize(w,h,false); camera.aspect = w/h; camera.updateProjectionMatrix();
@@ -207,12 +207,14 @@ function startTwin(T, host) {
     setRotation(x,y,z){twin.rotation.set(x,y,z);},
     setZoom,
     setFault,
+    setPropellerRpm(value){propellerRpm=Math.max(0,Number(value)||0);},
     setLabels(value){showLabels=value;labels.forEach(l=>l.visible=value);},
     setRotateEnabled(value){rotateEnabled=value;},
     reset(){twin.rotation.set(-.1,0,0);setZoom(1);},
     getRotation(){return {x:twin.rotation.x,y:twin.rotation.y,z:twin.rotation.z};}
   };
   window.addEventListener('aerotwin:fault',e=>setFault(e.detail));
+  window.addEventListener('aerotwin:engine-rpm',e=>{propellerRpm=Math.max(0,Number(e.detail?.rpm)||0);});
   window.addEventListener('aerotwin:zoom',e=>{const label=document.getElementById('zoomVal');if(label)label.textContent=`${Math.round(e.detail.zoom*100)}%`;});
   window.addEventListener('aerotwin:sensor-selected',e=>{const toast=document.getElementById('toast');if(toast){toast.textContent=`Selected sensor · ${e.detail.label}`;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),1800);}});
   window.addEventListener('aerotwin:labels',e=>window.aerotwinTwin.setLabels(e.detail.visible));
@@ -222,7 +224,7 @@ function startTwin(T, host) {
   window.addEventListener('resize',resize);
   twin.rotation.set(-.1,0,0);
   const clock = new T.Clock();
-  function animate(){requestAnimationFrame(animate);const t=clock.getElapsedTime();if(!activeFault){sensors.cht.userData.cap.scale.setScalar(1+Math.sin(t*2.2)*.055);sensors.cht.userData.cap.material.emissiveIntensity=.1+((Math.sin(t*2.2)+1)*.025);}renderer.render(scene,camera);}
+  function animate(){requestAnimationFrame(animate);const delta=Math.min(clock.getDelta(),.05),t=clock.elapsedTime;prop.rotation.z+=(propellerRpm/60)*Math.PI*2*.05*delta;if(!activeFault){sensors.cht.userData.cap.scale.setScalar(1+Math.sin(t*2.2)*.055);sensors.cht.userData.cap.material.emissiveIntensity=.1+((Math.sin(t*2.2)+1)*.025);}renderer.render(scene,camera);}
   animate();
   window.dispatchEvent(new CustomEvent('aerotwin:twin-ready'));
 }

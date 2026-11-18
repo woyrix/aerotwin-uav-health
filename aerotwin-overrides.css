@@ -114,3 +114,21 @@ html[data-theme="dark"] .login-form .muted,html[data-theme="dark"] .login-note,h
 html[data-theme="dark"] .login-form .button-quiet{background:#101010;border:1px solid #444;color:#eee}
 html[data-theme="dark"] .login-form input:-webkit-autofill,html[data-theme="dark"] .login-form input:-webkit-autofill:hover,html[data-theme="dark"] .login-form input:-webkit-autofill:focus{-webkit-text-fill-color:#f2f2f2;-webkit-box-shadow:0 0 0 1000px #101010 inset;transition:background-color 9999s ease-out 0s}
 html[data-theme="dark"] .login-bottom{border-color:#333}
+/* Dark dashboard contrast pass */
+html[data-theme="dark"] .page-heading h1,html[data-theme="dark"] .page-heading .eyebrow,html[data-theme="dark"] .breadcrumb span,html[data-theme="dark"] .sync-status,html[data-theme="dark"] .summary-label,html[data-theme="dark"] .card-icon,html[data-theme="dark"] .panel-header h2,html[data-theme="dark"] .text-link{color:#e6e6e6!important}
+html[data-theme="dark"] .page-heading p,html[data-theme="dark"] .summary-unit,html[data-theme="dark"] .metric-note,html[data-theme="dark"] .aircraft-cell small,html[data-theme="dark"] .mono small,html[data-theme="dark"] .last-flight,html[data-theme="dark"] .panel-footer,html[data-theme="dark"] .panel-header p,html[data-theme="dark"] .summary-foot,html[data-theme="dark"] .foot-right,html[data-theme="dark"] .empty-alerts p{color:#bcbcbc!important}
+html[data-theme="dark"] thead,html[data-theme="dark"] th{background:#111!important;color:#c4c4c4!important;border-color:#333!important}
+html[data-theme="dark"] td{background:#080808!important;color:#e8e8e8!important;border-color:#303030!important}
+html[data-theme="dark"] tbody tr:hover td{background:#1b1b1b!important}
+html[data-theme="dark"] .aircraft-thumb,html[data-theme="dark"] .workspace-icon,html[data-theme="dark"] .avatar{background:#1a1a1a!important;color:#e8e8e8!important;border-color:#383838!important}
+html[data-theme="dark"] .nav-count,html[data-theme="dark"] .alert-count,html[data-theme="dark"] .alert-badge{background:#242424!important;color:#e0e0e0!important}
+html[data-theme="dark"] .segmented{border-color:#383838!important}
+html[data-theme="dark"] .segmented button{color:#c0c0c0!important}
+html[data-theme="dark"] .segmented button.selected{background:#292929!important;color:#fff!important}
+html[data-theme="dark"] .empty-alerts span{color:#c6c6c6!important}
+html[data-theme="dark"] .empty-alerts b{color:#efefef!important}
+html[data-theme="dark"] .status-pill.healthy{background:#181818!important;color:#a8d1b8!important}
+html[data-theme="dark"] .risk,html[data-theme="dark"] .risk.moderate,html[data-theme="dark"] .risk.high{filter:brightness(1.35)}
+html[data-theme="dark"] .health-track,html[data-theme="dark"] .reliability-track{background:#292929!important}
+html[data-theme="dark"] .system-top,html[data-theme="dark"] .system-card small,html[data-theme="dark"] .user-profile,html[data-theme="dark"] .user-profile small{color:#d0d0d0!important}
+html[data-theme="dark"] .page-footer{color:#b0b0b0!important}

@@ -14,7 +14,7 @@ if (host) {
 function startTwin(T, host) {
   const stage = document.getElementById('modelStage');
   const scene = new T.Scene();
-  scene.background = new T.Color('#1b2831');
+  scene.background = new T.Color('#090909');
   const camera = new T.PerspectiveCamera(36, 1, 0.1, 100);
   const baseCamera = new T.Vector3(7.5, 6.2, 11.8);
   const renderer = new T.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' });
@@ -45,8 +45,8 @@ function startTwin(T, host) {
   const faultSensor = new T.Color('#df574d');
 
   const mat = (color, roughness = 0.46, metalness = 0.12, extra = {}) => new T.MeshStandardMaterial({ color, roughness, metalness, ...extra });
-  const shellMat = new T.MeshPhysicalMaterial({ color: 0xa9c8d7, roughness: 0.31, metalness: 0.2, transparent: true, opacity: 0.2, side: T.DoubleSide, depthWrite: false, clearcoat: 0.35, clearcoatRoughness: 0.25 });
-  const wingMat = new T.MeshPhysicalMaterial({ color: 0xc2d5dd, roughness: 0.35, metalness: 0.17, transparent: true, opacity: 0.25, side: T.DoubleSide, depthWrite: false, clearcoat: 0.3 });
+  const shellMat = new T.MeshPhysicalMaterial({ color: 0xb9c7ce, roughness: 0.38, metalness: 0.12, transparent: true, opacity: 0.3, side: T.DoubleSide, depthWrite: false, clearcoat: 0.25, clearcoatRoughness: 0.3 });
+  const wingMat = new T.MeshPhysicalMaterial({ color: 0xd1d8dc, roughness: 0.42, metalness: 0.1, transparent: true, opacity: 0.4, side: T.DoubleSide, depthWrite: false, clearcoat: 0.22 });
   const innerMat = mat('#8299a3', 0.48, 0.18);
   const darkMat = mat('#263740', 0.43, 0.42);
   const metalMat = mat('#a2b1b6', 0.26, 0.76);
@@ -104,18 +104,18 @@ function startTwin(T, host) {
   // Long-endurance MALE airframe: high aspect-ratio wing, twin tail booms and rear pusher.
   loftFuselage([[ -2.55,.055,.06],[-2.25,.14,.14],[-1.72,.21,.2],[-.85,.29,.26],[0,.32,.29],[.72,.28,.26],[1.42,.2,.19],[1.9,.12,.12],[2.23,.035,.04]], shellMat);
   planform([[-5.15,-.22],[-4.55,.34],[4.55,.34],[5.15,-.22],[4.85,-.53],[-4.85,-.53]], wingMat, -0.015, .095, 'High aspect-ratio main wing');
-  planform([[-1.12,-2.12],[1.12,-2.12],[1.02,-2.38],[-1.02,-2.38]], wingMat, 0.015, .075, 'Straight tailplane');
+  planform([[-1.18,-3.62],[1.18,-3.62],[1.08,-3.9],[-1.08,-3.9]], wingMat, 0.015, .075, 'Straight tailplane');
   // Twin tail booms lead from the main wing to separate vertical stabilizers.
   [-.68,.68].forEach(x=>{
-    tube(airframe,[[x,.035,-.18],[x*1.05,.045,-1.12],[x*1.12,.065,-2.25]],.075,innerMat,'Twin tail boom');
-    const finShape=new T.Shape();finShape.moveTo(-2.35,.06);finShape.lineTo(-2.02,.72);finShape.lineTo(-1.92,.07);finShape.closePath();
+    tube(airframe,[[x,.035,-.28],[x*1.04,.045,-1.45],[x*1.12,.065,-3.72]],.052,innerMat,'Twin tail boom');
+    const finShape=new T.Shape();finShape.moveTo(-3.98,.06);finShape.lineTo(-3.62,.72);finShape.lineTo(-3.53,.07);finShape.closePath();
     const finGeo=new T.ExtrudeGeometry(finShape,{depth:.075,bevelEnabled:true,bevelSegments:2,bevelSize:.02,bevelThickness:.02});finGeo.rotateY(Math.PI/2);
     const fin=addMesh(finGeo,wingMat,airframe,'Twin-boom vertical stabilizer');fin.position.x=x-.0375;
   });
   // Spars, ribs and control surfaces give the airframe depth and construction detail.
   [-3.65,-2.75,-1.8,-.9,0,.9,1.8,2.75,3.65].forEach(x => tube(airframe, [[x,-.005,-.42],[x*.82,-.005,-.02],[x*.32,-.005,.32]], .012, innerMat, 'Wing rib'));
   tube(airframe, [[-4.4,-.04,-.32],[0,-.04,-.49],[4.4,-.04,-.32]], .026, darkMat, 'Main wing spar');
-  tube(airframe, [[-1.1,.02,-2.07],[0,.02,-2.07],[1.1,.02,-2.07]], .025, darkMat, 'Tail spar');
+  tube(airframe, [[-1.12,.02,-3.76],[0,.02,-3.76],[1.12,.02,-3.76]], .025, darkMat, 'Tail spar');
   // No pilot canopy: the nose carries an optical payload turret typical of an unmanned aircraft.
   const turret=addMesh(new T.SphereGeometry(.24,24,16),new T.MeshPhysicalMaterial({color:0x718893,roughness:.2,metalness:.42,clearcoat:.7}),airframe,'EO/IR sensor turret');turret.scale.set(1,.72,1);turret.position.set(0,-.24,1.55);
   addMesh(new T.SphereGeometry(.11,18,12),mat('#283c45',.16,.28,{emissive:'#17313a',emissiveIntensity:.18}),airframe,'Optical sensor lens').scale.set(.8,.8,.45);

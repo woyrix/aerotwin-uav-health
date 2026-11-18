@@ -79,3 +79,30 @@ html[data-theme="light"] .sim-top-right .sim-state{color:#466c60}
 html[data-theme="light"] .axis-controls button,html[data-theme="light"] .zoom-controls button{background:#fff;color:#244c67;border-color:#bdcbd4}
 html[data-theme="light"] .stage-control{color:#e4edf0}
 @media(max-width:700px){.sim-layout{grid-template-columns:1fr}.sim-main{padding:15px}}
+/* Refined page scale and neutral black theme */
+body{zoom:1.06}
+html[data-theme="dark"] body,html[data-theme="dark"] .main-content,html[data-theme="dark"] .setup-body,html[data-theme="dark"] .sim-body{background:#000!important;color:#eee}
+html[data-theme="dark"] .sidebar,html[data-theme="dark"] .topbar,html[data-theme="dark"] .sim-topbar{background:#050505!important;border-color:#292929!important}
+html[data-theme="dark"] .panel,html[data-theme="dark"] .summary-card,html[data-theme="dark"] .chat-panel,html[data-theme="dark"] .sim-rail,html[data-theme="dark"] .twin-panel,html[data-theme="dark"] .control-panel{background:#090909!important;border-color:#292929!important}
+html[data-theme="dark"] .workspace-name,html[data-theme="dark"] .user-profile,html[data-theme="dark"] .system-card,html[data-theme="dark"] .chat-welcome,html[data-theme="dark"] .chat-message>div,html[data-theme="dark"] .chat-form textarea,html[data-theme="dark"] .telemetry-cell,html[data-theme="dark"] .fault-preset-grid button,html[data-theme="dark"] .theme-toggle,html[data-theme="dark"] .button-outline{background:#101010!important;color:#e8e8e8!important;border-color:#333!important}
+html[data-theme="dark"] .chat-message.user>div{background:#171717!important;color:#f2f2f2!important;border-color:#383838!important}
+html[data-theme="dark"] .topbar,html[data-theme="dark"] .sidebar>.brand,html[data-theme="dark"] .workspace-name,html[data-theme="dark"] .panel-header,html[data-theme="dark"] .twin-head,html[data-theme="dark"] .control-head,html[data-theme="dark"] .sim-rail-head,html[data-theme="dark"] .sensor-strip,html[data-theme="dark"] .chat-header,html[data-theme="dark"] .chat-form,html[data-theme="dark"] .panel-footer,html[data-theme="dark"] .alert-item,html[data-theme="dark"] .alert-panel-foot{border-color:#292929!important}
+html[data-theme="dark"] .nav-item.active,html[data-theme="dark"] .segmented button.selected,html[data-theme="dark"] .uav-select.selected,html[data-theme="dark"] .mini-aircraft{background:#191919!important;border-color:#363636!important;color:#f1f1f1!important}
+html[data-theme="dark"] th{color:#aaa;border-color:#292929}
+html[data-theme="dark"] td,html[data-theme="dark"] .aircraft-cell b,html[data-theme="dark"] .panel-header h2,html[data-theme="dark"] .summary-value,html[data-theme="dark"] .chat-header strong,html[data-theme="dark"] .chat-welcome b,html[data-theme="dark"] .twin-head h2,html[data-theme="dark"] .control-head h2,html[data-theme="dark"] .sim-rail h2,html[data-theme="dark"] .telemetry-cell b,html[data-theme="dark"] .fleet-chart-row>b{color:#e8e8e8}
+html[data-theme="dark"] .nav-item,html[data-theme="dark"] .breadcrumb,html[data-theme="dark"] .breadcrumb b,html[data-theme="dark"] .workspace-label,html[data-theme="dark"] .nav-label,html[data-theme="dark"] .panel-header p,html[data-theme="dark"] .muted,html[data-theme="dark"] .metric-note,html[data-theme="dark"] .summary-foot,html[data-theme="dark"] .foot-right,html[data-theme="dark"] .chat-message,html[data-theme="dark"] .chat-privacy,html[data-theme="dark"] .fleet-chart-row,html[data-theme="dark"] .fault-presets>p,html[data-theme="dark"] .twin-head p,html[data-theme="dark"] .control-bottom p,html[data-theme="dark"] .uav-select small{color:#b7b7b7}
+html[data-theme="dark"] .aircraft-row:hover td{background:#202020!important;color:#fff!important}
+html[data-theme="dark"] .aircraft-row:hover .aircraft-cell small,html[data-theme="dark"] .aircraft-row:hover .last-flight,html[data-theme="dark"] .aircraft-row:hover .mono small{color:#e0e0e0}
+html[data-theme="dark"] .fleet-chart-row>div{background:#242424;border-color:#3b3b3b}
+html[data-theme="dark"] .fault-preset-grid button.active{background:#222!important;border-color:#777!important;color:#fff!important}
+html[data-theme="dark"] .theme-toggle:hover,html[data-theme="dark"] .user-profile:hover{background:#202020!important}
+html[data-theme="dark"] .model-stage,html[data-theme="dark"] .model-loading{background:#090909!important}
+@media(max-width:700px){body{zoom:1}}
+html[data-theme="dark"] .login-screen{background:#000!important}
+html[data-theme="dark"] .login-art{background:#080808!important;border-color:#292929}
+html[data-theme="dark"] .login-art:before,html[data-theme="dark"] .login-art:after{display:none}
+html[data-theme="dark"] .login-caption h1{color:#f1f1f1}
+html[data-theme="dark"] .login-caption p,html[data-theme="dark"] .login-foot,html[data-theme="dark"] .login-bottom,html[data-theme="dark"] .login-form .muted,html[data-theme="dark"] .login-form label{color:#b5b5b5}
+html[data-theme="dark"] .login-form input{background:#101010;border-color:#353535;color:#f2f2f2}
+html[data-theme="dark"] .login-note{border-color:#333;color:#b4b4b4}
+html[data-theme="dark"] .login-form-wrap>.brand{color:#f1f1f1}

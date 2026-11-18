@@ -106,3 +106,11 @@ html[data-theme="dark"] .login-caption p,html[data-theme="dark"] .login-foot,htm
 html[data-theme="dark"] .login-form input{background:#101010;border-color:#353535;color:#f2f2f2}
 html[data-theme="dark"] .login-note{border-color:#333;color:#b4b4b4}
 html[data-theme="dark"] .login-form-wrap>.brand{color:#f1f1f1}
+/* Keep the sign-in screen consistent when dark mode is active */
+html[data-theme="dark"] .login-form-wrap{background:#000!important;color:#f1f1f1}
+html[data-theme="dark"] .login-form h2{color:#f1f1f1}
+html[data-theme="dark"] .login-form label{color:#d0d0d0!important}
+html[data-theme="dark"] .login-form .muted,html[data-theme="dark"] .login-note,html[data-theme="dark"] .login-bottom,html[data-theme="dark"] .login-bottom span{color:#b0b0b0}
+html[data-theme="dark"] .login-form .button-quiet{background:#101010;border:1px solid #444;color:#eee}
+html[data-theme="dark"] .login-form input:-webkit-autofill,html[data-theme="dark"] .login-form input:-webkit-autofill:hover,html[data-theme="dark"] .login-form input:-webkit-autofill:focus{-webkit-text-fill-color:#f2f2f2;-webkit-box-shadow:0 0 0 1000px #101010 inset;transition:background-color 9999s ease-out 0s}
+html[data-theme="dark"] .login-bottom{border-color:#333}

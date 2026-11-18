@@ -113,9 +113,10 @@ function setAudibleAlerts(on){$('buzzerToggle')?.classList.toggle('on',on);if($(
 
 document.addEventListener('DOMContentLoaded',()=>{
   const themeButton=$('themeToggle'),systemTheme=matchMedia('(prefers-color-scheme: dark)');
-  const syncThemeButton=()=>{if(themeButton){const dark=document.documentElement.dataset.theme==='dark';themeButton.textContent=dark?'Light mode':'Dark mode';themeButton.setAttribute('aria-pressed',String(dark))}};
-  syncThemeButton();themeButton?.addEventListener('click',()=>{document.documentElement.dataset.theme=document.documentElement.dataset.theme==='dark'?'light':'dark';localStorage.setItem('aerotwin-theme',document.documentElement.dataset.theme);syncThemeButton()});
-  systemTheme.addEventListener?.('change',event=>{if(!localStorage.getItem('aerotwin-theme')){document.documentElement.dataset.theme=event.matches?'dark':'light';syncThemeButton()}});
+  const applyThemePreference=()=>{const preference=localStorage.getItem('aerotwin-theme-preference')||'system';document.documentElement.dataset.theme=preference==='system'?(systemTheme.matches?'dark':'light'):preference};
+  const syncThemeButton=()=>{if(themeButton){const preference=localStorage.getItem('aerotwin-theme-preference')||'system';themeButton.textContent=`Theme: ${preference[0].toUpperCase()}${preference.slice(1)}`;themeButton.setAttribute('aria-label',`Color theme: ${preference}. Click to change.`);themeButton.setAttribute('aria-pressed',String(preference!=='system'))}};
+  applyThemePreference();syncThemeButton();themeButton?.addEventListener('click',()=>{const current=localStorage.getItem('aerotwin-theme-preference')||'system',next={system:'light',light:'dark',dark:'system'}[current];localStorage.setItem('aerotwin-theme-preference',next);applyThemePreference();syncThemeButton()});
+  systemTheme.addEventListener?.('change',()=>{if((localStorage.getItem('aerotwin-theme-preference')||'system')==='system'){applyThemePreference();syncThemeButton()}});
   firebaseReady=configureFirebase();
   window.addEventListener('storage',e=>{if(currentUser&&e.key===localFleetKey()){try{fleet=JSON.parse(e.newValue||'[]')}catch{fleet=[]}renderDashboard()}});
   if($('loginForm')){
